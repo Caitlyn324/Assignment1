@@ -1,0 +1,182 @@
+import java.util.Scanner;
+
+class Assignment1 {
+
+  public static void main(String[] args) {
+
+    int customers = 0;                       // hold the number of customers in main memory
+    int cont = 1;                            // decide whether or not to continue program
+    String confirmation;
+    Scanner input = new Scanner(System.in);  //create a Scanner object to read the input
+    int discount = 0;                // flag to hold whether or not the customer will recieve a discount
+    boolean repeatRequest = false;
+    double cost = 0;
+    boolean redo = false;
+    boolean unrecognized = false;
+
+
+    cont = NextCustomer();
+
+    while (cont == 1)
+    {
+      int books = 0;                           // hold the number of books in main memory
+      int paintings = 0;                       // hold the number of paintings in main memory
+      int packs = 0;                           // hold the number of packs in main memory
+      int bookmarks = 0;                       // hold the number of bookmarks in main memory
+
+      ++customers;
+
+      Menu();
+      do {
+        do {
+          System.out.println("How many Books will you be buying today? (type 0 for none)");
+          books = input.nextInt();
+          repeatRequest = Confirmation();
+        } while (repeatRequest == true);
+        Receipt(books, paintings, packs, bookmarks);
+        repeatRequest = false;
+
+        do {
+          System.out.println("How many Paintings will you be buying today? (type 0 for none)");
+          paintings = input.nextInt();
+          repeatRequest = Confirmation();
+        } while (repeatRequest == true);
+        Receipt(books, paintings, packs, bookmarks);
+        repeatRequest = false;
+
+        do {
+          System.out.println("How many Bookmarks will you be buying today? (type 0 for none)");
+          bookmarks = input.nextInt();
+          repeatRequest = Confirmation();
+        } while (repeatRequest == true);
+        repeatRequest = false;
+
+        if (bookmarks > 6)
+        {
+          packs = bookmarks / 6;
+          bookmarks %= 6;
+        }
+
+        Receipt(books, paintings, packs, bookmarks);
+        redo = ConfirmationOrder();
+
+      } while (redo == true);
+
+      cost = TotalCost(books, paintings, packs, bookmarks);
+
+       discount = customers % 3;
+      if (customers > 3 && discount == 0)
+        {
+          cost *= 0.9;
+          System.out.println("You won a 10% discount!");
+        }
+      else
+        {
+          System.out.println("You did not get a discount! Better luck next time!");
+        }
+       cost *= 1.07;
+       System.out.printf("your total is %6.2f.\n", cost);
+       System.out.println("Thank you, come again!");
+       cont = NextCustomer();
+  }
+
+  System.out.println("Thank you for using this Program, Come Again!");
+
+  }
+
+  private static int NextCustomer()
+  {
+    Scanner input = new Scanner(System.in);  //create a Scanner object to read the input
+    System.out.println("are there any Customers in line? (enter '1' for yes or '2' for no)"); //ask if any customers are in line so we can determine whether or not to contine the program
+    int nextCustomer = input.nextInt();
+    if (nextCustomer != 1 && nextCustomer != 2)
+    {
+      do {
+        System.out.println("Unrecognized input, please try again!");
+        System.out.println("are there any Customers in line? (enter '1' for yes or '2' for no)"); //ask if any customers are in line so we can determine whether or not to contine the program
+        nextCustomer = input.nextInt();
+      } while (nextCustomer != 1 && nextCustomer != 2);
+    }
+    return nextCustomer;
+  }
+
+  private static void Menu()
+  {
+    System.out.println("Hello! Here are the items we have available for sale:\n" +
+    "Books ($5.00 each)\n" +
+    "Bookmarks ($1.00 each, or a pack of six for $5.00)\n" +
+    "Paintings of Books ($100.00 each)");
+  }
+
+  private static boolean Confirmation()
+  {
+    Scanner input = new Scanner(System.in);  //create a Scanner object to read the input
+    boolean redo = false;
+    boolean unrecognized = false;
+    do {
+      System.out.println("Is that the correct ammount? (Y/N)");
+      String confirmation = input.nextLine();
+      if (confirmation.equalsIgnoreCase("N"))
+        {
+          System.out.println("Okay, let's try again!");
+          redo = true;
+        }
+      else if (!confirmation.equalsIgnoreCase("Y"))
+        {
+          System.out.println("Unrecognized Input, Please Try Again!");
+        }
+    } while (unrecognized == true);
+    return redo;
+  }
+
+  private static void Receipt(int receiptBooks, int receiptPaints, int receiptPackages, int receiptMarks)
+  {
+    System.out.println("So far, your cart has:");
+    if (receiptBooks > 0)
+    {
+      System.out.println(receiptBooks + " Books");
+    }
+
+    if (receiptPaints > 0)
+    {
+      System.out.println(receiptPaints + " Paintings");
+    }
+    if (receiptPackages > 0)
+    {
+      System.out.println(receiptPackages + " Packs of Bookmarks");
+    }
+
+    if (receiptMarks > 0)
+    {
+      System.out.println(receiptMarks + " Individual Bookmarks");
+    }
+  }
+
+  private static boolean ConfirmationOrder()
+  {
+    Scanner input = new Scanner(System.in);  //create a Scanner object to read the input
+    boolean redo = false;
+    boolean unrecognized = false;
+    do {
+      System.out.println("This is your order. Would like to procede to Check out (type Y) or would you like to reorder? (N)");
+      String confirmation = input.nextLine();
+      if (confirmation.equalsIgnoreCase("N"))
+        {
+          System.out.println("Okay, let's try again!");
+          redo = true;
+        }
+      else if (!confirmation.equalsIgnoreCase("Y"))
+        {
+          System.out.println("Unrecognized Input, Please Try Again!");
+        }
+    } while (unrecognized == true);
+    return redo;
+  }
+
+  private static double TotalCost(int costBooks, int costPainting, int costPacks, int costBookmarks)
+  {
+    double totalCost = (costBooks * 5) + (costPainting * 100) + (costPacks * 5) + (costBookmarks);
+    return totalCost;
+  }
+
+}
