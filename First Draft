@@ -73,11 +73,11 @@ class Assignment1 {
           System.out.println("Thank you for your selection!");
         }
 
-      else if (order == 4) {
+      else if (order == 4) {                // get a reciept
         Receipt(books, paintings, packs, bookmarks);
       }
 
-      else if (order == 5) {
+      else if (order == 5) {                // checkout, change the boolean ot allow for checkout
         confirmation = ConfirmOrder();
         if (confirmation == false) {
           checkout = false;
@@ -90,16 +90,15 @@ class Assignment1 {
         Receipt(books, paintings, packs, bookmarks);
       }
 
-      else {
+      else {                                            //invalid input
         System.out.print("Please enter a valid input number: ");
       }
     } while (checkout != true);
 
-    subtotal = subtotal(books, paintings, packs, bookmarks);
-    total = checkout(books, paintings, packs, bookmarks, subtotal, customers);
-    System.out.println(total);
+    subtotal = subtotal(books, paintings, packs, bookmarks);                    //returns subtotal
+    total = checkout(books, paintings, packs, bookmarks, subtotal, customers);  //returns total
 
-    do {
+    do {                                                                        //get the ammount paid and change
       System.out.println(total);
       System.out.print("Please enter the ammount paid: ");
       payment = input.nextDouble();
