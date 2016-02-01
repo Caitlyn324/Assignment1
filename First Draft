@@ -1,87 +1,126 @@
 import java.util.Scanner;
+import java.text.NumberFormat;
 
 class Assignment1 {
 
   public static void main(String[] args) {
 
     int customers = 0;                       // hold the number of customers in main memory
-    int cont = 1;                            // decide whether or not to continue program
-    String confirmation;
+    int moreCustomers = 1;                            // decide whether or not to continue program
+    boolean confirmation;
     Scanner input = new Scanner(System.in);  //create a Scanner object to read the input
     int discount = 0;                // flag to hold whether or not the customer will recieve a discount
     boolean repeatRequest = false;
     double cost = 0;
-    boolean redo = false;
     boolean unrecognized = false;
+    int order = 0;
+    boolean checkout = false;
+    NumberFormat formatter = NumberFormat.getCurrencyInstance();
+    double subtotal = 0;
+    double total = 0;
+    double payment = 0;
+    double change = -1.0;
 
+    moreCustomers = NextCustomer();
 
-    cont = NextCustomer();
-
-    while (cont == 1)
+    while (moreCustomers == 1)
     {
       int books = 0;                           // hold the number of books in main memory
       int paintings = 0;                       // hold the number of paintings in main memory
       int packs = 0;                           // hold the number of packs in main memory
       int bookmarks = 0;                       // hold the number of bookmarks in main memory
+      checkout = false;
+      change =
 
       ++customers;
+      System.out.println("Hello! Welcome to Flourish and Blotts!\n");
+      do {                                    //loot will continue until the cutstomer wants to check out
+        Menu();                               //display the customer's Options
+        order = input.nextInt();              //recieves the customer's order so that we can determine what path to follow
+        if (order == 1) {                     //protocol for selecting 1
+             do {
+              System.out.println("How many Books will you be buying today? (type 0 for none)");
+              books = input.nextInt();        //takes the number of books the customer wants and stores it in books
+              repeatRequest = Confirmation(); //confirms whether or not this was the correct ammount
+            } while (repeatRequest == true);  //will continue asking the customer until they have input the correct ammount
+            repeatRequest = false;            //resets the boolean for recycling in the next order
+            System.out.println("Thank you for your selection!");
+          }
 
-      Menu();
-      do {
-        do {
-          System.out.println("How many Books will you be buying today? (type 0 for none)");
-          books = input.nextInt();
-          repeatRequest = Confirmation();
-        } while (repeatRequest == true);
-        Receipt(books, paintings, packs, bookmarks);
-        repeatRequest = false;
-
-        do {
-          System.out.println("How many Paintings will you be buying today? (type 0 for none)");
-          paintings = input.nextInt();
-          repeatRequest = Confirmation();
-        } while (repeatRequest == true);
-        Receipt(books, paintings, packs, bookmarks);
-        repeatRequest = false;
-
-        do {
-          System.out.println("How many Bookmarks will you be buying today? (type 0 for none)");
-          bookmarks = input.nextInt();
-          repeatRequest = Confirmation();
-        } while (repeatRequest == true);
-        repeatRequest = false;
-
-        if (bookmarks > 6)
-        {
-          packs = bookmarks / 6;
-          bookmarks %= 6;
+        else if ( order == 2) {             //protocol for selecting 2
+          do {
+            System.out.println("How many Paintings will you be buying today? (type 0 for none)");
+            paintings = input.nextInt();
+            repeatRequest = Confirmation(); //confirms whether or not this was the correct ammount
+          } while (repeatRequest == true);  //will continue asking the customer until they have input the correct ammount
+          repeatRequest = false;            //resets the boolean for recycling in the next order
+          System.out.println("Thank you for your selection!");
         }
 
+        else if (order == 3) {
+          do {
+            System.out.println("How many Bookmarks will you be buying today? (type 0 for none)");
+            bookmarks = input.nextInt();
+            repeatRequest = Confirmation(); //confirms whether or not this was the correct ammount
+          } while (repeatRequest == true);  //will continue asking the customer until they have input the correct ammount
+          repeatRequest = false;            //resets the boolean for recycling in the next order
+
+          if (bookmarks >= 6)                //if they order more than 1 bookmark, this will
+          {
+            packs = bookmarks / 6;
+            bookmarks %= 6;
+          }
+          System.out.println("Thank you for your selection!");
+        }
+
+      else if (order == 4) {
         Receipt(books, paintings, packs, bookmarks);
-        redo = ConfirmationOrder();
+      }
 
-      } while (redo == true);
+      else if (order == 5) {
+        confirmation = ConfirmOrder();
+        if (confirmation == false) {
+          checkout = false;
+        }
+        else
+          checkout = true;
+        }
+      else if (order == 6) {                            //got testing perposes, adds sample data and prints a Receipt for formatting
+        books = paintings = packs = bookmarks = 5;
+        Receipt(books, paintings, packs, bookmarks);
+      }
 
-      cost = TotalCost(books, paintings, packs, bookmarks);
+      else {
+        System.out.print("Please enter a valid input number: ");
+      }
+    } while (checkout != true);
 
-       discount = customers % 3;
-      if (customers > 3 && discount == 0)
-        {
-          cost *= 0.9;
-          System.out.println("You won a 10% discount!");
+    subtotal = subtotal(books, paintings, packs, bookmarks);
+    total = checkout(books, paintings, packs, bookmarks, subtotal, customers);
+    System.out.println(total);
+
+    do {
+      System.out.println(total);
+      System.out.print("Please enter the ammount paid: ");
+      payment = input.nextDouble();
+      if (payment > total)
+      {
+        change = payment - total;
+        System.out.println("Your change is " + formatter.format(change));
+      }
+      else if (payment < total) {
+          total = total - payment;
+          total = (Math.round(total * 100)) / 100;
+          System.out.println("Insufficient Payment, You Still Owe " + formatter.format(total) + ".");
+           change = -1.0;
         }
       else
-        {
-          System.out.println("You did not get a discount! Better luck next time!");
-        }
-       cost *= 1.07;
-       System.out.printf("your total is %6.2f.\n", cost);
-       System.out.println("Thank you, come again!");
-       cont = NextCustomer();
+        change = 1;
+      } while (change < 0);
+    System.out.println("Thank you for using this Program, Come Again!");
+    moreCustomers = NextCustomer();
   }
-
   System.out.println("Thank you for using this Program, Come Again!");
-
   }
 
   private static int NextCustomer()
@@ -102,10 +141,14 @@ class Assignment1 {
 
   private static void Menu()
   {
-    System.out.println("Hello! Here are the items we have available for sale:\n" +
-    "Books ($5.00 each)\n" +
-    "Bookmarks ($1.00 each, or a pack of six for $5.00)\n" +
-    "Paintings of Books ($100.00 each)");
+    System.out.println("Here are the items we have available for sale:\n" +
+    "1 - Books ($5.00 each)\n" +
+    "2 - Bookmarks ($1.00 each, or a pack of six for $5.00)\n" +
+    "3 - Paintings of Books ($100.00 each)\n\n" +
+    "Alternative Options:\n" +
+    "4 - See Current Order\n" +
+    "5 - Checkout\n");
+    System.out.print("Please make a numbered selection: ");
   }
 
   private static boolean Confirmation()
@@ -114,6 +157,7 @@ class Assignment1 {
     boolean redo = false;
     boolean unrecognized = false;
     do {
+      unrecognized = false;
       System.out.println("Is that the correct ammount? (Y/N)");
       String confirmation = input.nextLine();
       if (confirmation.equalsIgnoreCase("N"))
@@ -124,59 +168,121 @@ class Assignment1 {
       else if (!confirmation.equalsIgnoreCase("Y"))
         {
           System.out.println("Unrecognized Input, Please Try Again!");
+          unrecognized = true;
         }
     } while (unrecognized == true);
     return redo;
   }
 
-  private static void Receipt(int receiptBooks, int receiptPaints, int receiptPackages, int receiptMarks)
-  {
-    System.out.println("So far, your cart has:");
-    if (receiptBooks > 0)
-    {
-      System.out.println(receiptBooks + " Books");
-    }
-
-    if (receiptPaints > 0)
-    {
-      System.out.println(receiptPaints + " Paintings");
-    }
-    if (receiptPackages > 0)
-    {
-      System.out.println(receiptPackages + " Packs of Bookmarks");
-    }
-
-    if (receiptMarks > 0)
-    {
-      System.out.println(receiptMarks + " Individual Bookmarks");
-    }
-  }
-
-  private static boolean ConfirmationOrder()
+  private static boolean ConfirmOrder()
   {
     Scanner input = new Scanner(System.in);  //create a Scanner object to read the input
-    boolean redo = false;
+    boolean cont = true;
     boolean unrecognized = false;
     do {
-      System.out.println("This is your order. Would like to procede to Check out (type Y) or would you like to reorder? (N)");
+      unrecognized = false;
+      System.out.println("Are you sure that you want to checkout? (Y/N)");
       String confirmation = input.nextLine();
       if (confirmation.equalsIgnoreCase("N"))
         {
           System.out.println("Okay, let's try again!");
-          redo = true;
+          cont = false;
         }
       else if (!confirmation.equalsIgnoreCase("Y"))
         {
           System.out.println("Unrecognized Input, Please Try Again!");
+          unrecognized = true;
         }
     } while (unrecognized == true);
-    return redo;
+    return cont;
   }
 
-  private static double TotalCost(int costBooks, int costPainting, int costPacks, int costBookmarks)
+  private static void Receipt(int receiptBooks, int receiptPaints, int receiptPackages, int receiptMarks)
   {
-    double totalCost = (costBooks * 5) + (costPainting * 100) + (costPacks * 5) + (costBookmarks);
-    return totalCost;
+    NumberFormat formatter = NumberFormat.getCurrencyInstance();
+    System.out.println("So far, your cart has:");
+    if (receiptBooks > 0)
+      {
+        double bookCost = receiptBooks * 5;
+        System.out.println(receiptBooks + " Books:                  " + formatter.format(bookCost));
+      }
+    if (receiptPaints > 0)
+      {
+        double paintingCost = receiptPaints * 100;
+        System.out.println(receiptPaints + " Paintings:             " + formatter.format(paintingCost));
+      }
+    if (receiptPackages > 0)
+      {
+        double packCost = receiptPackages * 5;
+        System.out.println(receiptPackages + " Packs of Bookmarks:     " + formatter.format(packCost));
+      }
+    if (receiptMarks > 0)
+      {
+        double bookmarkCost = receiptMarks;
+        System.out.println(receiptMarks + " Individual Bookmarks:    " + formatter.format(bookmarkCost) + "\n");
+      }
   }
 
-}
+
+  private static double subtotal(int costBooks, int costPainting, int costPacks, int costBookmarks)
+  {
+    double subtotal = (costBooks * 5) + (costPainting * 100) + (costPacks * 5) + (costBookmarks);
+    return subtotal;
+  }
+
+  private static double checkout(int receiptBooks, int receiptPaints, int receiptPackages, int receiptMarks, double checkoutCost, int customers)
+  {
+    NumberFormat formatter = NumberFormat.getCurrencyInstance();
+
+    int customerCount = customers;
+    int discount = customerCount % 3;
+    double subtotal = checkoutCost;
+    double total;
+
+
+
+    System.out.println("------------------------------------------------------");
+
+    if (discount == 0) {
+      System.out.println("Congratulations, you get a 10% Customer Discount!");
+      total = subtotal * 0.9;
+    }
+
+    else {
+      System.out.println("Sorry, you didn't get the discount! Better luck next time!");
+      total = subtotal;
+    }
+
+    if (receiptBooks > 0) {
+        double bookCost = receiptBooks * 5;
+        System.out.println(receiptBooks + " Books:                       " + formatter.format(bookCost));
+      }
+
+    if (receiptPaints > 0) {
+        double paintingCost = receiptPaints * 100;
+        System.out.println(receiptPaints + " Paintings:                  " + formatter.format(paintingCost));
+      }
+
+    if (receiptPackages > 0) {
+        double packCost = receiptPackages * 5;
+        System.out.println(receiptPackages + " Packs of Bookmarks:          " + formatter.format(packCost));
+      }
+
+    if (receiptMarks > 0) {
+        double bookmarkCost = receiptMarks;
+        System.out.println(receiptMarks + " Individual Bookmarks:         " + formatter.format(bookmarkCost) + "\n");
+      }
+
+    double tax = total * 0.07;
+    total *= 1.07;
+    total = Math.round(total * 100);
+    total = total / 100;
+
+    System.out.println("Subtotal:                     " + formatter.format(subtotal));
+    System.out.println ("Tax:                           " + formatter.format(tax));
+    System.out.println("Your total is                 " + formatter.format(total));
+    System.out.println("-------------------------------------------------------");
+
+    return total;
+  }
+  }
